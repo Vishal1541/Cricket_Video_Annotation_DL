@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>    
+  </head>
+  <body>
+    <input type="button" id='script' name="scriptbutton" value=" Run Script " onclick="goPython()">
+
+    <?php
+    exec("python gui.py");
+    ?>
+
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+    <script>
+        function goPython(){
+            $.ajax({
+              url: "/users/home/dlagroup5/wd/Project/final_annotation/gui.py",
+             context: document.body
+            }).done(function() {
+             alert('finished python script');;
+            });
+        }
+    </script>
+  </body>
+</html>

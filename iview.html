@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!-- Display image, show mouse position and pixel values
+Author: Changjiang Yang
+Date:	08/14/2016
+TODO:	Add drag and drop
+-->
+<html class="gr__yangcha_github_io"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<style>
+div.footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	margin: 0 auto;
+	background: #0072BB;
+	color:#fff;
+}
+</style>
+</head>
+
+<body data-gr-c-s-loaded="true">
+0=Rohit,
+1=KLRahul,
+2=Virat,
+3=Rishab,
+4=Dhoni,
+5=Dinesh,
+6=KPandya,
+7=Umesh,
+8=Chahal,
+9=Bumrah,
+10=Mayank,
+11=DShort,
+12=Stoinis,
+13=Finch,
+14=Maxwell,
+15=Peter,
+16=Turner,
+17=Nile,
+18=Cummins,
+19=Richardson,
+20=Zampa,
+21=Behrendorff<br>
+Ball No: <input type="text" id="ballNo">
+Batsman ID: <input type="text" id="batsman">
+Bowler ID: <input type="text" id="bowler">
+<p>
+	Open image: <input type="file" id="inputImage" style="height: 60px; width: 100px;">
+	<label id="saved"></label>
+</p>
+
+<canvas id="canvas" style="margin:12px;" width="1280" height="720"></canvas>
+
+<div class="footer" id="results"><table style="width:100%;table-layout:fixed"><tbody><tr><td>X: 750</td><td>Y: 93</td><td>Red: 116</td><td>Green: 146</td><td>Blue: 72</td><td>Alpha: 255</td></tr></tbody></table></div>
+
+<script>
+var URL = window.URL;
+var cvs = document.getElementById('canvas');
+var ctx = cvs.getContext('2d');
+var res = document.getElementById('results');
+var imgName = "xyz";
+var times = 0;
+var Path = "frames";
+var groundtruth;
+var saved = document.getElementById('saved');
+
+cvs.addEventListener('mousemove', mousePos, false);
+
+window.onload = function() {
+	saved.innerHTML = "<b>Pick Batsman X1,Y1";
+	var inputImage = document.getElementById('inputImage');
+	cvs.addEventListener('click', getCoordinates);
+	inputImage.addEventListener('change', handleImageFiles, false);
+}
+
+function getCoordinates(evt){
+	// if(times == 0)	saved.innerHTML = "<b>Pick Batsman X1,Y1";
+	if(times == 0)	saved.innerHTML = "<b>Pick Batsman X2,Y2";
+	else if(times == 1)	saved.innerHTML = "<b>Pick Bowler X1,Y1";
+	else 	saved.innerHTML = "<b>Pick Bowler X2,Y2";
+	if(times == 0){
+	var ballNo = document.getElementById('ballNo').value;
+		groundtruth = Path + "/" + ballNo + "/" + imgName + ".jpg 2 ";
+	}
+	var rect = cvs.getBoundingClientRect();
+	var x = parseInt(evt.clientX - rect.left);
+	var y = parseInt(evt.clientY - rect.top);
+	times += 1;
+	if(times <= 4){
+		groundtruth += x + " " + y + " ";
+	}
+	if(times == 2){
+		var batsman = document.getElementById('batsman').value;
+		groundtruth += batsman + " ";
+	}
+	if(times == 4){
+		var bowler = document.getElementById('bowler').value;
+		groundtruth += bowler;
+		console.log(groundtruth);
+
+		copyToClipboard(groundtruth);
+		saved.innerHTML = "Copied to clipboard: <b>" + groundtruth + "</b>";
+
+		groundtruth = "";
+		times = 0;
+	}
+}
+
+const copyToClipboard = str => {
+  const el = document.createElement('textarea');
+  el.value = str;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+};
+
+function mousePos(evt) {
+	var rect = cvs.getBoundingClientRect();
+	var x = parseInt(evt.clientX - rect.left);
+	var y = parseInt(evt.clientY - rect.top);
+	var p = ctx.getImageData(x, y, 1, 1).data;
+	results.innerHTML = '<table style="width:100%;table-layout:fixed"><td>X: ' 
+		+ x + '</td><td>Y: ' + y + '</td><td>Red: ' 
+		+ p[0] + '</td><td>Green: ' + p[1] + '</td><td>Blue: ' 
+		+ p[2] + '</td><td>Alpha: ' + p[3]+"</td></table>";
+	return {x, y};
+}
+
+function handleImageFiles(e) {	
+	var url = URL.createObjectURL(e.target.files[0]);
+	var img = new Image();
+	img.onload = function() {
+		cvs.width = img.width;
+		cvs.height = img.height;
+		ctx.drawImage(img, 0, 0);    
+	}
+	img.src = url;
+	imgName = e.target.value;
+	imgName = imgName.split("fakepath\\")[1].split(".")[0];
+}
+
+</script>
+
+      
+</body></html>
